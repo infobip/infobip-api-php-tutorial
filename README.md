@@ -112,11 +112,11 @@ When you choose this option it opens **logsRequestForm.php** page with input for
 As quoted in the code above, **logs.php** is the page which catches the posted data. You should define **URL for sending request** with sent message logs endpoint, and send request to it with **GET** HTTP method this time (CURLOPT_HTTPGET option set to TRUE):
 
 ```
-$getUrl = 'https://api.infobip.com/sms/1/logs?limit=5763';
+$getUrl = 'https://api.infobip.com/sms/1/logs?limit=42';
 
 $curl = curl_init();
 curl_setopt($curl, CURLOPT_URL, $getUrl);
-curl_setopt($curl, CURLOPT_HTTPHEADER , array('Accept:application/xml'));
+curl_setopt($curl, CURLOPT_HTTPHEADER , array('Accept: application/xml'));
 curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
 curl_setopt($curl, CURLOPT_USERPWD , $username. ":" . $password);
 curl_setopt($curl, CURLOPT_HTTPGET , TRUE);

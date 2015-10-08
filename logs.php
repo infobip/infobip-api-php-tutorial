@@ -5,14 +5,18 @@
 <body>
 
 <?php
+
+// Using GMT timezone when not specified
+date_default_timezone_set('Europe/London');
+
 if (isset($_POST['username'])) {
 $username = $_POST['username'];
 $password = $_POST['password'];
 
-$getUrl = 'https://api.infobip.com/sms/1/logs?limit=5763';
+$getUrl = 'https://api.infobip.com/sms/1/logs?limit=42';
 $curl = curl_init();
 curl_setopt($curl, CURLOPT_URL, $getUrl);
-curl_setopt($curl, CURLOPT_HTTPHEADER, array('Accept:application/xml'));
+curl_setopt($curl, CURLOPT_HTTPHEADER, array('Accept: application/xml'));
 curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
 curl_setopt($curl, CURLOPT_USERPWD, $username . ":" . $password);
 curl_setopt($curl, CURLOPT_HTTPGET, TRUE);

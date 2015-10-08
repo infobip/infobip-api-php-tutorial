@@ -22,6 +22,10 @@ if (strpos(trim($responseBody), '<reportResponse>') === 0) {
 }
 
 if (isset($result)) {
+
+    // Using GMT timezone when not specified
+    date_default_timezone_set('Europe/London');
+
     foreach ($result as $message) {
         $formatedSentAt = date("M d, Y - H:i:s P T", strtotime($message->sentAt));
 
