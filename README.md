@@ -12,6 +12,8 @@ In this tutorial, these examples are presented on a start (**index.php**) page, 
 
 To be able to follow this tutorial and also to write and test your own, you need to set the environment. Because we used [cURL] for sending messages, getting logs and receiving delivery reports, you have to enable php extension for it in your web server. For the purpose of this tutorial, you can use some solution from [AMP] solution stack (wamp, xampp, ...). Those are software stacks for the various OSes consisting of Apache web server, MySQL database and PHP programming language support. You should enable **php_curl** extension for the one you choose.
 
+Note that in order to have secure sending of SMS messages, these examples should be hosted on HTTPS (using TLS) when going live because some parameters (like username and password) are sent as HTTP POST parameters for sake of simplicity.
+
 ## [Fully featured textual message][fftm]
 
 When you choose this option it opens **advancedSms.php** page with form for sending "Fully featured textual message". Submit button will **POST** those fields to a page specified in **action** attribute of the form. In this example it will post it to itself.
@@ -21,40 +23,65 @@ When you choose this option it opens **advancedSms.php** page with form for send
 ```
 
 ### Building the request
-Before manipulating values in this form you have to check if they are set. In this example we have only checked for **fromInput** field. You do not have to check for all fields, because POST HTTP method will set all, whereas none will be set when it is called for the first loading of page, ie. using GET request. After this check you should define **URL for sending request**, and **body of request** which is going to be sent. Body of request will be an XML or JSON structured string, whose structure depends of input fields in request form described above:
+Before manipulating values in this form you have to check if they are set. In this example we have only checked for **toInput** field. You do not have to check for all fields, because POST HTTP method will set all, whereas none will be set when it is called for the first loading of page, ie. using GET request. After this check you should define **URL for sending request**, and **body of request** which is going to be sent. Body of request will be an XML or JSON structured string, whose structure depends of input fields in request form described above. Forming the request body will look like the following:
 
 ```
-$postUrl = "https://api.infobip.com/sms/1/text/advanced";
-$xmlString = '<request>
-				<messages>
-				    <message>';
-if ($from <> '')
-	$xmlString .= '<from>'.$from.'</from>';
+        $xmlString = '<request>
+					<messages>
+						<message>';
+
+        if ($from <> '')
+            $xmlString .= '<from>' . $from . '</from>';
+
+        $xmlString .= '<destinations>
+					  <destination>
+					  <to>' . $to . '</to>';
+
+        if ($messageId <> '')
+            $xmlString .= '<messageId>' . $messageId . '</messageId>';
+
+        $xmlString .= '</destination></destinations>';
+
+        if ($text <> '')
+            $xmlString .= '<text>' . $text . '</text>';
+
+        if ($notifyUrl <> '')
+            $xmlString .= '<notifyUrl>' . $notifyUrl . '</notifyUrl>';
+
+        if ($notifyContentType <> '')
+            $xmlString .= '<notifyContentType>' . $notifyContentType . '</notifyContentType>';
+
+        if ($callbackData <> '')
+            $xmlString .= '<callbackData>' . $callbackData . '</callbackData>';
+
+        $xmlString .= '</message>
+				</messages>
+						</request>';
+
 ```
 
-As only required field is **"to"**, you must check if it is empty before sending request. If it is empty, skip all the logic for sending request and parsing response, and notify the user about that. For sending the request we chose [cURL].
+As only required field is **"to"**, you must check if it is empty before sending request. If it is empty, skip all the logic, and notify the user about that. For sending the request we chose [cURL].
 
 ```
-ch = curl_init();
-$header = array('Content-Type:application/xml', 'Accept:application/xml');
+    ch = curl_init();
+    $header = array('Content-Type:application/xml', 'Accept:application/xml');
 
-curl_setopt($ch, CURLOPT_URL, $postUrl);
-curl_setopt($ch, CURLOPT_HTTPHEADER , $header);
-curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-curl_setopt($ch, CURLOPT_USERPWD , $username . ":" . $password);
-curl_setopt($ch, CURLOPT_CONNECTTIMEOUT,2);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-curl_setopt($ch, CURLOPT_FOLLOWLOCATION,TRUE);
-curl_setopt($ch, CURLOPT_MAXREDIRS,2);
-curl_setopt($ch, CURLOPT_POST, 1);
-curl_setopt($ch, CURLOPT_POSTFIELDS, $xmlString);
+    curl_setopt($ch, CURLOPT_URL, $postUrl);
+    curl_setopt($ch, CURLOPT_HTTPHEADER , $header);
+    curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+    curl_setopt($ch, CURLOPT_USERPWD , $username . ":" . $password);
+    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT,2);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($ch, CURLOPT_FOLLOWLOCATION,TRUE);
+    curl_setopt($ch, CURLOPT_MAXREDIRS,2);
+    curl_setopt($ch, CURLOPT_POST, 1);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $xmlString);
 
-// response of the POST request
-$response = curl_exec($ch);
-$httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-$responseBodyXml = new SimpleXMLElement($response);
-
-curl_close($ch);
+    // response of the POST request
+    $response = curl_exec($ch);
+    $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $responseBodyXml = new SimpleXMLElement($response);
+    curl_close($ch);
 ```
 
 In quoted code we used many options for setting request, which is initialized with **curl_init()**:
@@ -72,22 +99,22 @@ After all options are set, you execute the request with `curl_exec($ch)`. This m
 If all went right and HTTP response code from 2xx family was received (200 OK, 201 CREATED, etc), you can extract needed information from response body and present it to the user. We chose: *Message ID, To, SMS Count, Status Group, Group Name, ID, Name and Description*, but you can choose whatever you want:
 
 ```
-if ($httpcode >=200 && $httpcode<300) {
-
-	$result= $responseBodyXml -> messages -> message;
-    foreach ($result as $message) {
-        $sentMessageResponse = array(
-            "message_id" => $message -> messageId,
-            "to" => $message -> to,
-			"status_groupId" => $message -> status -> groupId,
-			"status_groupName" => $message -> status -> groupName,
-            "status_id" => $message -> status -> id,
-            "status_name" => $message -> status -> name,
-            "status_description" => $message -> status -> description,
-			"sms_count" => $message -> smsCount
-        );
-        $arrayOfSentMessageResponses[] = $sentMessageResponse;
-    }
+    if ($httpcode >=200 && $httpcode<300) {
+        $result= $responseBodyXml -> messages -> message;
+        
+        foreach ($result as $message) {
+            $sentMessageResponse = array(
+                "message_id" => $message -> messageId,
+                "to" => $message -> to,
+                "status_groupId" => $message -> status -> groupId,
+                "status_groupName" => $message -> status -> groupName,
+                "status_id" => $message -> status -> id,
+                "status_name" => $message -> status -> name,
+                "status_description" => $message -> status -> description,
+                "sms_count" => $message -> smsCount
+            );
+            $arrayOfSentMessageResponses[] = $sentMessageResponse;
+        }
 ```
 
 Next, *foreach loop* will iterate through array of sent message responses and write a single row with appropriate columns in them. **NOTE:** In this example, you can send only one message to one destination, so array of sent message responses is not necessary, but is mandatory if you implement a form for sending a message to multiple destinations. At the end, you can parse the body of request if the exception occurred:

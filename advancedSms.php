@@ -38,55 +38,51 @@
 </form>
 
 <?php
-if (isset($_POST['fromInput'])) {
-    $from = $_POST['fromInput'];
+if (isset($_POST['toInput'])) {
     $to = $_POST['toInput'];
-    $messageId = $_POST['messageIdInput'];
-    $text = $_POST['textInput'];
-    $notifyUrl = $_POST['notifyUrlInput'];
-    $notifyContentType = $_POST['notifyContentTypeInput'];
-    $callbackData = $_POST['callbackData'];
-    $username = $_POST['username'];
-    $password = $_POST['password'];
+    if ($to <> '') {
+        $from = $_POST['fromInput'];
+        $messageId = $_POST['messageIdInput'];
+        $text = $_POST['textInput'];
+        $notifyUrl = $_POST['notifyUrlInput'];
+        $notifyContentType = $_POST['notifyContentTypeInput'];
+        $callbackData = $_POST['callbackData'];
+        $username = $_POST['username'];
+        $password = $_POST['password'];
 
-    $postUrl = "https://api.infobip.com/sms/1/text/advanced";
+        $postUrl = "https://api.infobip.com/sms/1/text/advanced";
 
-    $xmlString = '<request>
+        $xmlString = '<request>
 					<messages>
 						<message>';
 
-    if ($from <> '')
-        $xmlString .= '<from>' . $from . '</from>';
+        if ($from <> '')
+            $xmlString .= '<from>' . $from . '</from>';
 
-    $xmlString .= '<destinations>
-					  <destinations>
+        $xmlString .= '<destinations>
+					  <destination>
 					  <to>' . $to . '</to>';
 
-    if ($messageId <> '')
-        $xmlString .= '<messageId>' . $messageId . '</messageId>';
+        if ($messageId <> '')
+            $xmlString .= '<messageId>' . $messageId . '</messageId>';
 
-    $xmlString .= '</destinations></destinations>';
+        $xmlString .= '</destination></destinations>';
 
-    if ($text <> '')
-        $xmlString .= '<text>' . $text . '</text>';
+        if ($text <> '')
+            $xmlString .= '<text>' . $text . '</text>';
 
-    if ($notifyUrl <> '')
-        $xmlString .= '<notifyUrl>' . $notifyUrl . '</notifyUrl>';
+        if ($notifyUrl <> '')
+            $xmlString .= '<notifyUrl>' . $notifyUrl . '</notifyUrl>';
 
-    if ($notifyContentType <> '')
-        $xmlString .= '<notifyContentType>' . $notifyContentType . '</notifyContentType>';
+        if ($notifyContentType <> '')
+            $xmlString .= '<notifyContentType>' . $notifyContentType . '</notifyContentType>';
 
-    if ($callbackData <> '')
-        $xmlString .= '<callbackData>' . $callbackData . '</callbackData>';
+        if ($callbackData <> '')
+            $xmlString .= '<callbackData>' . $callbackData . '</callbackData>';
 
-    $xmlString .= '</message>
+        $xmlString .= '</message>
 				</messages>
 						</request>';
-
-
-    if ($to <> '') {
-
-        echo '<span style="color:#FF0000"><b>Response:</b></span><br>';
 
         $ch = curl_init();
         $header = array('Content-Type:application/xml', 'Accept:application/xml');
@@ -102,19 +98,16 @@ if (isset($_POST['fromInput'])) {
         curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $xmlString);
 
-
         // response of the POST request
         $response = curl_exec($ch);
         $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         $responseBodyXml = new SimpleXMLElement($response);
-
         curl_close($ch);
 
         if ($httpcode >= 200 && $httpcode < 300) {
-
             $result = $responseBodyXml->messages->message;
-            foreach ($result as $message) {
 
+            foreach ($result as $message) {
                 $sentMessageResponse = array(
                     "message_id" => $message->messageId,
                     "to" => $message->to,
@@ -128,7 +121,9 @@ if (isset($_POST['fromInput'])) {
                 $arrayOfSentMessageResponses[] = $sentMessageResponse;
             }
 
+            echo '<span style="color:#FF0000"><b>Response:</b></span><br>';
             ?>
+
             <table cellspacing="0" id="logs_table" border="1">
                 <thead>
                 <tr class="headings">
@@ -141,49 +136,22 @@ if (isset($_POST['fromInput'])) {
                     <th>Status Description</th>
                     <th>SMS Count</th>
                 </tr>
-
                 </thead>
-
                 <tbody>
-
-
                 <?php
-
                 foreach ($arrayOfSentMessageResponses as $sentMessageResponse) {
-                    ?>
-                    <tr>
-                        <td>
-                            <?php echo $sentMessageResponse["message_id"]; ?>
-                        </td>
-                        <td>
-                            <?php echo $sentMessageResponse["to"]; ?>
-                        </td>
-                        <td>
-                            <?php echo $sentMessageResponse["status_groupId"]; ?>
-                        </td>
-                        <td>
-                            <?php echo $sentMessageResponse["status_groupName"]; ?>
-                        </td>
-                        <td>
-                            <?php echo $sentMessageResponse["status_id"]; ?>
-                        </td>
-                        <td>
-                            <?php echo $sentMessageResponse["status_name"]; ?>
-                        </td>
-                        <td>
-                            <?php echo $sentMessageResponse["status_description"]; ?>
-                        </td>
-                        <td>
-                            <?php echo $sentMessageResponse["sms_count"]; ?>
-                        </td>
-                    </tr>
-                    <?php
-
+                    echo "<tr>";
+                    echo "<td>" . $sentMessageResponse["message_id"] . "</td>";
+                    echo "<td>" . $sentMessageResponse["to"] . "</td>";
+                    echo "<td>" . $sentMessageResponse["status_groupId"] . "</td>";
+                    echo "<td>" . $sentMessageResponse["status_groupName"] . "</td>";
+                    echo "<td>" . $sentMessageResponse["status_id"] . "</td>";
+                    echo "<td>" . $sentMessageResponse["status_name"] . "</td>";
+                    echo "<td>" . $sentMessageResponse["status_description"] . "</td>";
+                    echo "<td>" . $sentMessageResponse["sms_count"] . "</td>";
+                    echo "</tr>";
                 } ?>
-
                 </tbody>
-
-
             </table>
             <?php
         } else {
@@ -191,7 +159,6 @@ if (isset($_POST['fromInput'])) {
             echo '<br>' . $responseBodyXml->requestError->serviceException->text;
         }
     } else echo "You did not enter the destination.";
-
 }
 ?>
 </body>
