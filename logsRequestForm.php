@@ -4,7 +4,7 @@
 </head>
 <body>
 
-<form action="logs.php" method='post'>
+<form action="logs.php" method="POST">
 	Username:<br>
     <input type="text" name="username">
     <br>

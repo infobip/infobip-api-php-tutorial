@@ -49,7 +49,7 @@ if (isset($_POST['fromInput'])) {
     $username = $_POST['username'];
     $password = $_POST['password'];
 
-    $postUrl = "http://api.infobip.com/sms/1/text/advanced";
+    $postUrl = "https://api.infobip.com/sms/1/text/advanced";
 
     $xmlString = '<request>
 					<messages>

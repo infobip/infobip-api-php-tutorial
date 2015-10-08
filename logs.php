@@ -9,7 +9,7 @@ if (isset($_POST['username'])) {
 $username = $_POST['username'];
 $password = $_POST['password'];
 
-$getUrl = 'http://api.infobip.com/sms/1/logs?limit=5763';
+$getUrl = 'https://api.infobip.com/sms/1/logs?limit=5763';
 $curl = curl_init();
 curl_setopt($curl, CURLOPT_URL, $getUrl);
 curl_setopt($curl, CURLOPT_HTTPHEADER, array('Accept:application/xml'));
