@@ -1,104 +1,80 @@
 <html>
 <head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
     <title>Delivery reports on Notify URL</title>
 </head>
 <body>
+<div class="container">
 
-<?php
-function isJson($string)
-{
-    json_decode($string);
-    return (json_last_error() == JSON_ERROR_NONE);
-}
-
-$responseBody = file_get_contents('php://input');
-
-if (strpos(trim($responseBody), '<reportResponse>') === 0) {
-    $xmlData = simplexml_load_string($responseBody);
-    $result = $xmlData->results->result;
-} elseif ($responseBody <> '' && isJson($responseBody)) {
-    $jsonObject = json_decode($responseBody);
-    $result = $jsonObject->results;
-}
-
-if (isset($result)) {
-
-    // Using GMT timezone when not specified
-    date_default_timezone_set('Europe/London');
-
-    foreach ($result as $message) {
-        $formatedSentAt = date("M d, Y - H:i:s P T", strtotime($message->sentAt));
-
-        $deliveryReport = array(
-            "message_id" => $message->messageId,
-            "to" => $message->to,
-            "err_gname" => $message->error->groupName,
-            "err_desc" => $message->error->description,
-            "sent_at" => $formatedSentAt,
-            "general_status" => $message->status->groupName,
-            "status_description" => $message->status->description
-        );
-        $arrayOfDeliveryReport[] = $deliveryReport;
-    }
-
-    ?>
-    <table cellspacing="0" id="dlr_table" border="1">
-        <thead>
-        <tr class="headings">
-            <th>Message ID</th>
-            <th>To</th>
-            <th>Error Group Name</th>
-            <th>Error Description</th>
-            <th>Sent At</th>
-            <th>General Status</th>
-            <th>Status Description</th>
-        </tr>
-
-        </thead>
-
-        <tbody>
-
-
-        <?php
-
-        foreach ($arrayOfDeliveryReport as $pushedDlr) {
-            ?>
-            <tr>
-                <td>
-                    <?php echo $pushedDlr["message_id"]; ?>
-                </td>
-                <td>
-                    <?php echo $pushedDlr["to"]; ?>
-                </td>
-                <td>
-                    <?php echo $pushedDlr["err_gname"]; ?>
-                </td>
-                <td>
-                    <?php echo $pushedDlr["err_desc"]; ?>
-                </td>
-                <td>
-                    <?php echo $pushedDlr["sent_at"]; ?>
-                </td>
-                <td>
-                    <?php echo $pushedDlr["general_status"]; ?>
-                </td>
-                <td>
-                    <?php echo $pushedDlr["status_description"]; ?>
-                </td>
-            </tr>
-            <?php
-
-        } ?>
-
-        </tbody>
-
-    </table>
+    <div class="page-header">
+        <h1>Delivery reports on Notify URL</h1>
+    </div>
+    <p class="lead">Receive a Delivery reports on your callback server's Notify URL.</p>
 
     <?php
-} else {
-    echo '<span style="color:#FF0000"><b>No delivery report pushed to callback server.</b></span>';
-}
-?>
 
+    function isJson($string)
+    {
+        json_decode($string);
+        return (json_last_error() == JSON_ERROR_NONE);
+    }
+
+    $responseBody = file_get_contents('php://input');
+
+    if ($responseBody <> "") {
+        if (isJson($responseBody)) {
+            $responseJson = json_decode($responseBody);
+            $results = $responseJson->results;
+        } else if (strpos(trim($responseBody), '<reportResponse>') === 0) {
+            $responseXml = simplexml_load_string($responseBody);
+            $results = $responseBody->results->result;
+        }
+    }
+
+    if (isset($result)) {
+        // Using GMT timezone when not specified
+        date_default_timezone_set('Europe/London');
+        ?>
+
+        <table id="dlr_table" class="table table-condensed">
+            <thead>
+            <tr class="headings">
+                <th>Message ID</th>
+                <th>To</th>
+                <th>Sent at</th>
+                <th>Price per message</th>
+                <th>Currency</th>
+                <th>Status</th>
+                <th>Error</th>
+            </tr>
+            </thead>
+            <tbody>
+            <?php
+            foreach ($result as $message) {
+                echo "<tr>";
+                echo "<td>" . $message->messageId . "</td>";
+                echo "<td>" . $message->to . "</td>";
+
+                $formattedSentAt = date("M d, Y - H:i:s P T", strtotime($message->sentAt));
+                echo "<td>" . $formattedSentAt . "</td>";
+                echo "<td>" . $message->price->pricePerMessage . "</td>";
+                echo "<td>" . $message->price->currency . "</td>";
+                echo "<td>" . $message->status->name . "</td>";
+                echo "<td>" . $message->error->name . "</td>";
+                echo "</tr>";
+            } ?>
+            </tbody>
+        </table>
+
+        <?php
+    } else {
+        ?>
+        <div class="alert alert-info" role="alert">
+            No delivery report pushed to callback server.
+        </div>
+        <?php
+    }
+    ?>
+</div>
 </body>
 </html>

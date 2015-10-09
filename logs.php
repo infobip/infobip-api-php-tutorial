@@ -1,103 +1,111 @@
 <html>
 <head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
     <title>Sent messages logs</title>
 </head>
 <body>
+<div class="container">
 
-<?php
+    <div class="page-header">
+        <h1>Sent messages logs</h1>
+    </div>
+    <p class="lead">Get logs for sent SMS.</p>
 
-// Using GMT timezone when not specified
-date_default_timezone_set('Europe/London');
+    <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST" class="form-horizontal">
+        <div class="panel panel-default">
+            <div class="panel-heading"><h4>Authentication</h4></div>
+            <div class="panel-body">
+                <div class="form-group">
+                    <label for="in_username" class="col-sm-2 control-label">Username</label>
 
-if (isset($_POST['username'])) {
-$username = $_POST['username'];
-$password = $_POST['password'];
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="in_username" placeholder="Username" name="username">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="in_password" class="col-sm-2 control-label">Password</label>
 
-$getUrl = 'https://api.infobip.com/sms/1/logs?limit=42';
-$curl = curl_init();
-curl_setopt($curl, CURLOPT_URL, $getUrl);
-curl_setopt($curl, CURLOPT_HTTPHEADER, array('Accept: application/xml'));
-curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-curl_setopt($curl, CURLOPT_USERPWD, $username . ":" . $password);
-curl_setopt($curl, CURLOPT_HTTPGET, TRUE);
-curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-
-$response = curl_exec($curl);
-$httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-$responseBodyXml = new SimpleXMLElement($response);
-
-curl_close($curl);
-
-if ($httpcode >= 200 && $httpcode < 300) {
-
-$result = $responseBodyXml->results->result;
-foreach ($result as $message) {
-    $formatedSentAt = date("M d, Y - H:i:s P T", strtotime($message->sentAt));
-
-    $sentMessageLog = array(
-        "message_id" => $message->messageId,
-        "to" => $message->to,
-        "from" => $message->from,
-        "text" => $message->text,
-        "sent_at" => $formatedSentAt,
-        "general_status" => $message->status->groupName,
-        "status_description" => $message->status->description
-    );
-    $arrayOfMessageLogs[] = $sentMessageLog;
-}
-?>
-
-<table cellspacing="0" id="logs_table" border="1">
-    <thead>
-    <tr class="headings">
-        <th>Message ID</th>
-        <th>To</th>
-        <th>From</th>
-        <th>Text</th>
-        <th>General Status</th>
-        <th>Status Description</th>
-        <th>Sent At</th>
-    </tr>
-    </thead>
-    <tbody>
+                    <div class="col-sm-10">
+                        <input type="password" class="form-control" id="in_password" placeholder="Password"
+                               name="password">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <input class="btn btn-default btn-lg" type="submit" value="Get logs">
+    </form>
+    <hr>
 
     <?php
+    // Using GMT timezone when not specified
+    date_default_timezone_set('Europe/London');
 
-    foreach ($arrayOfMessageLogs as $sentMessageLog) {
-        ?>
-        <tr>
-            <td>
-                <?php echo $sentMessageLog["message_id"]; ?>
-            </td>
-            <td>
-                <?php echo $sentMessageLog["to"]; ?>
-            </td>
-            <td>
-                <?php echo $sentMessageLog["from"]; ?>
-            </td>
-            <td>
-                <?php echo $sentMessageLog["text"]; ?>
-            </td>
-            <td>
-                <?php echo $sentMessageLog["general_status"]; ?>
-            </td>
-            <td>
-                <?php echo $sentMessageLog["status_description"]; ?>
-            </td>
-            <td>
-                <?php echo $sentMessageLog["sent_at"]; ?>
-            </td>
-        </tr>
-        <?php
-    }
-    } else {
-        echo $responseBodyXml->requestError->serviceException->messageId;
-        echo '<br>' . $responseBodyXml->requestError->serviceException->text;
-    }
+    if (isset($_POST['username'])) {
+        $username = $_POST['username'];
+        $password = $_POST['password'];
+
+        $getUrl = 'https://api.infobip.com/sms/1/logs?limit=20';
+        $curl = curl_init();
+        curl_setopt($curl, CURLOPT_URL, $getUrl);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, array('Accept: application/json'));
+        curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+        curl_setopt($curl, CURLOPT_USERPWD, $username . ":" . $password);
+        curl_setopt($curl, CURLOPT_HTTPGET, TRUE);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+
+        $response = curl_exec($curl);
+        $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        $responseBody = json_decode($response);
+        curl_close($curl);
+
+        if ($httpCode >= 200 && $httpCode < 300) {
+            $logs = $responseBody->results;
+            echo '<h4>Response</h4><br>';
+            ?>
+
+            <table id="logs_table" class="table table-condensed">
+                <thead>
+                <tr>
+                    <th>Message ID</th>
+                    <th>To</th>
+                    <th>From</th>
+                    <th>Text</th>
+                    <th>General Status</th>
+                    <th>Status Description</th>
+                    <th>Sent At</th>
+                </tr>
+                </thead>
+                <tbody>
+                <?php
+
+                foreach ($logs as $log) {
+                    echo "<tr>";
+                    echo "<td>" . $log->messageId . "</td>";
+                    echo "<td>" . $log->to . "</td>";
+                    echo "<td>" . $log->from . "</td>";
+                    echo "<td>" . $log->text . "</td>";
+                    echo "<td>" . $log->status->groupName . "</td>";
+                    echo "<td>" . $log->status->description . "</td>";
+
+                    $formattedSentAt = date("M d, Y - H:i:s P T", strtotime($log->sentAt));
+                    echo "<td>" . $formattedSentAt . "</td>";
+                    echo "</tr>";
+                } ?>
+                </tbody>
+            </table>
+            <?php
+        } else {
+            ?>
+            <div class="alert alert-danger" role="alert">
+                <b>An error occurred!</b> Reason:
+                <?php
+                echo $responseBody->requestError->serviceException->text;
+                ?>
+            </div>
+            <?php
+        }
     }
     ?>
-
-    </tbody>
-</table>
+</div>
 </body>
 </html>

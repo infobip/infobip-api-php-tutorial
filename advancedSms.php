@@ -1,165 +1,211 @@
 <html>
 <head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
     <title>Fully featured textual message</title>
 </head>
 <body>
-<form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST" id="send_form">
-    <span style="color:#FF0000"><b>Authentication</b></span><br>
-    <label for="in_username">Username:</label><br>
-    <input id="in_username" type="text" name="username" title="Username">
-    <br>
-    <label for="in_password">Password:</label><br>
-    <input id="in_password" type="password" name="password" title="Password">
+<div class="container">
+
+    <div class="page-header">
+        <h1>Fully featured textual message</h1>
+    </div>
+    <p class="lead">Send advanced SMS with the all available features and parameters.</p>
+
+    <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST" id="send_form"
+          class="form-horizontal">
+        <div class="panel panel-default">
+            <div class="panel-heading"><h4>Authentication</h4></div>
+            <div class="panel-body">
+                <div class="form-group">
+                    <label for="in_username" class="col-sm-2 control-label">Username</label>
+
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="in_username" placeholder="Username" name="username">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="in_password" class="col-sm-2 control-label">Password</label>
+
+                    <div class="col-sm-10">
+                        <input type="password" class="form-control" id="in_password" placeholder="Password"
+                               name="password">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel panel-default">
+            <div class="panel-heading"><h4>Send message</h4></div>
+            <div class="panel-body">
+                <div class="form-group">
+                    <label for="in_from" class="col-sm-2 control-label">Sender</label>
+
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="in_from" placeholder="Sender (Can be alphanumeric)"
+                               name="fromInput">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="in_to" class="col-sm-2 control-label">Phone number</label>
+
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="in_to"
+                               placeholder="Phone number in international format (example: 41793026727)" name="toInput">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="in_messageId" class="col-sm-2 control-label">Message ID</label>
+
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="in_messageId" placeholder="Message ID"
+                               name="messageIdInput">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="in_text" class="col-sm-2 control-label">Message text</label>
+
+                    <div class="col-sm-10">
+                <textarea type="text" class="form-control" id="in_text" placeholder="Message text" name="textInput"
+                          rows="4"></textarea>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="in_notify_url" class="col-sm-2 control-label">Notify URL</label>
+
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="in_notify_url" placeholder="Notify URL"
+                               name="notifyUrlInput">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="in_notify_contentType" class="col-sm-2 control-label">Notify content type</label>
+
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="in_notify_contentType"
+                               placeholder="Notify content type (application/json, application/xml)"
+                               name="notifyContentTypeInput">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="in_callback_data" class="col-sm-2 control-label">Callback data</label>
+
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="in_callback_data" placeholder="Callback data"
+                               name="callbackDataInput">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <input class="btn btn-default btn-lg" type="submit" value="Send">
+    </form>
     <hr>
-    <br>
 
-    <label for="in_from">From:</label><br>
-    <input id="in_from" type="text" name="fromInput" title="From">
-    <br>
-    <label for="in_to">To*<span style="color:#FF0000">(required)</span>:</label><br>
-    <input id="in_to" type="text" name="toInput" title="To">
-    <br>
-    <label for="in_messageId">Message ID:</label><br>
-    <input id="in_messageId" type="text" name="messageIdInput" title="Message ID">
-    <br>
-    <label for="in_text">Text:</label><br>
-    <textarea id="in_text" rows="4" cols="50" name="textInput" form="send_form" title="Message Text"></textarea>
-    <br>
-    <label for="in_notify_url">Notify URL:</label><br>
-    <input id="in_notify_url" type="text" name="notifyUrlInput" title="Notify URL">
-    <br>
-    <label for="in_notify_contentType">Notify ContentType:</label><br>
-    <input id="in_notify_contentType" type="text" name="notifyContentTypeInput"
-           title="Notify content type (application/xml, application/json, ...)">
-    <br>
-    <label for="in_callback_data">Callback Data:</label><br>
-    <input id="in_callback_data" type="text" name="callbackData" title="User defined callback data"><br>
-    <input type="submit" value="Send">
-</form>
+    <?php
+    if (isset($_POST['toInput'])) {
+        $to = $_POST['toInput'];
+        if ($to <> '') {
+            $from = $_POST['fromInput'];
+            $messageId = $_POST['messageIdInput'];
+            $text = $_POST['textInput'];
+            $notifyUrl = $_POST['notifyUrlInput'];
+            $notifyContentType = $_POST['notifyContentTypeInput'];
+            $callbackData = $_POST['callbackDataInput'];
+            $username = $_POST['username'];
+            $password = $_POST['password'];
 
-<?php
-if (isset($_POST['toInput'])) {
-    $to = $_POST['toInput'];
-    if ($to <> '') {
-        $from = $_POST['fromInput'];
-        $messageId = $_POST['messageIdInput'];
-        $text = $_POST['textInput'];
-        $notifyUrl = $_POST['notifyUrlInput'];
-        $notifyContentType = $_POST['notifyContentTypeInput'];
-        $callbackData = $_POST['callbackData'];
-        $username = $_POST['username'];
-        $password = $_POST['password'];
+            $postUrl = "https://api.infobip.com/sms/1/text/advanced";
 
-        $postUrl = "https://api.infobip.com/sms/1/text/advanced";
+            // creating an object for sending SMS
+            $destination = array("messageId" => $messageId,
+                "to" => $to);
 
-        $xmlString = '<request>
-					<messages>
-						<message>';
+            $message = array("from" => $from,
+                "destinations" => array($destination),
+                "text" => $text,
+                "notifyUrl" => $notifyUrl,
+                "notifyContentType" => $notifyContentType,
+                "callbackData" => $callbackData);
 
-        if ($from <> '')
-            $xmlString .= '<from>' . $from . '</from>';
+            $postData = array("messages" => array($message));
+            $postDataJson = json_encode($postData);
 
-        $xmlString .= '<destinations>
-					  <destination>
-					  <to>' . $to . '</to>';
+            $ch = curl_init();
+            $header = array("Content-Type:application/json", "Accept:application/json");
 
-        if ($messageId <> '')
-            $xmlString .= '<messageId>' . $messageId . '</messageId>';
+            curl_setopt($ch, CURLOPT_URL, $postUrl);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+            curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+            curl_setopt($ch, CURLOPT_USERPWD, $username . ":" . $password);
+            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 2);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, TRUE);
+            curl_setopt($ch, CURLOPT_MAXREDIRS, 2);
+            curl_setopt($ch, CURLOPT_POST, 1);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $postDataJson);
 
-        $xmlString .= '</destination></destinations>';
+            // response of the POST request
+            $response = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $responseBody = json_decode($response);
+            curl_close($ch);
 
-        if ($text <> '')
-            $xmlString .= '<text>' . $text . '</text>';
-
-        if ($notifyUrl <> '')
-            $xmlString .= '<notifyUrl>' . $notifyUrl . '</notifyUrl>';
-
-        if ($notifyContentType <> '')
-            $xmlString .= '<notifyContentType>' . $notifyContentType . '</notifyContentType>';
-
-        if ($callbackData <> '')
-            $xmlString .= '<callbackData>' . $callbackData . '</callbackData>';
-
-        $xmlString .= '</message>
-				</messages>
-						</request>';
-
-        $ch = curl_init();
-        $header = array('Content-Type:application/xml', 'Accept:application/xml');
-
-        curl_setopt($ch, CURLOPT_URL, $postUrl);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
-        curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-        curl_setopt($ch, CURLOPT_USERPWD, $username . ":" . $password);
-        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 2);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, TRUE);
-        curl_setopt($ch, CURLOPT_MAXREDIRS, 2);
-        curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $xmlString);
-
-        // response of the POST request
-        $response = curl_exec($ch);
-        $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        $responseBodyXml = new SimpleXMLElement($response);
-        curl_close($ch);
-
-        if ($httpcode >= 200 && $httpcode < 300) {
-            $result = $responseBodyXml->messages->message;
-
-            foreach ($result as $message) {
-                $sentMessageResponse = array(
-                    "message_id" => $message->messageId,
-                    "to" => $message->to,
-                    "status_groupId" => $message->status->groupId,
-                    "status_groupName" => $message->status->groupName,
-                    "status_id" => $message->status->id,
-                    "status_name" => $message->status->name,
-                    "status_description" => $message->status->description,
-                    "sms_count" => $message->smsCount
-                );
-                $arrayOfSentMessageResponses[] = $sentMessageResponse;
-            }
-
-            echo '<span style="color:#FF0000"><b>Response:</b></span><br>';
-            ?>
-
-            <table cellspacing="0" id="logs_table" border="1">
-                <thead>
-                <tr class="headings">
-                    <th>Message ID</th>
-                    <th>To</th>
-                    <th>Status Group ID</th>
-                    <th>Status Group Name</th>
-                    <th>Status ID</th>
-                    <th>Status Name</th>
-                    <th>Status Description</th>
-                    <th>SMS Count</th>
-                </tr>
-                </thead>
-                <tbody>
+            if ($httpCode >= 200 && $httpCode < 300) {
+                $messages = $responseBody->messages;
+                echo '<h4>Response</h4><br>';
+                ?>
+                <div>
+                    <table id="logs_table" class="table table-condensed">
+                        <thead>
+                        <tr>
+                            <th>Message ID</th>
+                            <th>To</th>
+                            <th>Status Group ID</th>
+                            <th>Status Group Name</th>
+                            <th>Status ID</th>
+                            <th>Status Name</th>
+                            <th>Status Description</th>
+                            <th>SMS Count</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <?php
+                        foreach ($messages as $message) {
+                            echo "<tr>";
+                            echo "<td>" . $message->messageId . "</td>";
+                            echo "<td>" . $message->to . "</td>";
+                            echo "<td>" . $message->status->groupId . "</td>";
+                            echo "<td>" . $message->status->groupName . "</td>";
+                            echo "<td>" . $message->status->id . "</td>";
+                            echo "<td>" . $message->status->name . "</td>";
+                            echo "<td>" . $message->status->description . "</td>";
+                            echo "<td>" . $message->smsCount . "</td>";
+                            echo "</tr>";
+                        }
+                        ?>
+                        </tbody>
+                    </table>
+                </div>
                 <?php
-                foreach ($arrayOfSentMessageResponses as $sentMessageResponse) {
-                    echo "<tr>";
-                    echo "<td>" . $sentMessageResponse["message_id"] . "</td>";
-                    echo "<td>" . $sentMessageResponse["to"] . "</td>";
-                    echo "<td>" . $sentMessageResponse["status_groupId"] . "</td>";
-                    echo "<td>" . $sentMessageResponse["status_groupName"] . "</td>";
-                    echo "<td>" . $sentMessageResponse["status_id"] . "</td>";
-                    echo "<td>" . $sentMessageResponse["status_name"] . "</td>";
-                    echo "<td>" . $sentMessageResponse["status_description"] . "</td>";
-                    echo "<td>" . $sentMessageResponse["sms_count"] . "</td>";
-                    echo "</tr>";
-                } ?>
-                </tbody>
-            </table>
-            <?php
+            } else {
+                ?>
+                <div class="alert alert-danger" role="alert">
+                    <b>An error occurred!</b> Reason:
+                    <?php
+                    echo $responseBody->requestError->serviceException->text;
+                    ?>
+                </div>
+                <?php
+            }
         } else {
-            echo $responseBodyXml->requestError->serviceException->messageId;
-            echo '<br>' . $responseBodyXml->requestError->serviceException->text;
+            ?>
+            <div class="alert alert-danger" role="alert">
+                <b>An error occurred!</b> Reason: Phone number is missing
+            </div>
+            <?php
         }
-    } else echo "You did not enter the destination.";
-}
-?>
+    }
+    ?>
+</div>
 </body>
 </html>
