@@ -4,11 +4,10 @@
 
 This tutorial will guide you through implementing Infobip's SMS services. It includes three examples for some of the main features for sending SMS messages and checking their status:
 
-  - [Fully featured textual message][fftm]
-  - [Sent messages logs][sentlogs]
+  - [Fully featured textual message]([fftm])  - [Sent messages logs]#entlogs[]]
   - [Delivery reports on Notify URL][dlrnotify]
 
-In this tutorial, these examples are presented on a start (**index.php**) page, so you can choose which action you want to preform.
+Ithishe tutorial, these examples are presented on a start (**index.php**) page, so you can choose which action you want to preform.
 
 To be able to follow this tutorial and also to write and test your own, you need to set the environment. Because we used [cURL] for sending messages, getting logs and receiving delivery reports, you have to enable php extension for it in your web server. For the purpose of this tutorial, you can use some solution from [AMP] solution stack (wamp, xampp, ...). Those are software stacks for the various OSes consisting of Apache web server, MySQL database and PHP programming language support. You should enable **php_curl** extension for the one you choose.
 
