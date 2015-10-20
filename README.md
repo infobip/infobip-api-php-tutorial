@@ -2,8 +2,8 @@
 
 Welcome to Infobip beginners’ tutorial for creating your own SMS web app. We will guide you one step at a time through implementation of Infobip SMS API and SMS services. Tutorial includes three examples for some of the main features for sending SMS messages and checking their status:
 
-  - [Fully featured textual message](#fully-featured-textual-message)
-  - [Sent messages logs](#sent-message-logs)
+  - [Fully featured textual message](#a-fully-featured-textual-message)
+  - [Sent messages logs](#sent-messages-logs)
   - [Delivery reports on Notify URL](#delivery-reports-on-notify-url)
 
 We will [start](https://github.com/infobip/infobip-api-php-tutorial/blob/master/index.php) with examples and presentations so you can choose which action you want to perform.
