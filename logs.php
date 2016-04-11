@@ -52,6 +52,7 @@
         curl_setopt($curl, CURLOPT_USERPWD, $username . ":" . $password);
         curl_setopt($curl, CURLOPT_HTTPGET, TRUE);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+	curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
 
         $response = curl_exec($curl);
         $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
