@@ -143,6 +143,7 @@
             curl_setopt($ch, CURLOPT_MAXREDIRS, 2);
             curl_setopt($ch, CURLOPT_POST, 1);
             curl_setopt($ch, CURLOPT_POSTFIELDS, $postDataJson);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 
             // response of the POST request
             $response = curl_exec($ch);
