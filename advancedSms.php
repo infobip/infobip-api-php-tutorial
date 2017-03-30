@@ -113,7 +113,10 @@
 
     if (isset($_POST['toInput'])) {
         // Create configuration object that will tell the client how to authenticate API requests
-        $configuration = new BasicAuthConfiguration($_POST['username'], $_POST['password']);
+        // Additionally, note the use of http protocol in base path.
+        // That is for tutorial purposes only and should not be done in production.
+        // For production you can leave the baseUrl out and rely on the https based default value.
+        $configuration = new BasicAuthConfiguration($_POST['username'], $_POST['password'], 'http://api.infobip.com/');
         // Create a client for sending sms texts by passing it the configuration object
         $client = new SendMultipleTextualSmsAdvanced($configuration);
 
@@ -183,8 +186,13 @@
             <div class="alert alert-danger" role="alert">
 	            <b>An error occurred!</b> Reason:
                 <?php
+                $errorMessage = $apiCallException->getMessage();
                 $errorResponse = json_decode($apiCallException->getMessage());
-                $errorReason = $errorResponse->requestError->serviceException->text;
+                if (json_last_error() == JSON_ERROR_NONE) {
+                    $errorReason = $errorResponse->requestError->serviceException->text;
+                } else {
+                    $errorReason = $errorMessage;
+                }
                 echo $errorReason;
                 ?>
             </div>

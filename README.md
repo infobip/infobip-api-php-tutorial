@@ -83,9 +83,13 @@ an instance of `SendMultipleTextualSmsAdvanced` client. You can get it by provid
 configuration object:
  
 ```php
-$configuration = new BasicAuthConfiguration($_POST['username'], $_POST['password']);
+$configuration = new BasicAuthConfiguration($_POST['username'], $_POST['password'], 'http://api.infobip.com/');
 $client = new SendMultipleTextualSmsAdvanced($configuration);
 ```
+
+Note the last parameter in the `BasicAuthConfiguration` constructor ant its use of http protocol. This is 
+done for simplicity only. In your production implementation you should leave that parameter out entirely. In that 
+case configuration object will default to using https. See note in the [introduction](#infobip-api-php-tutorial) chapter.
 
 Now you have a `$client` that you can ask to execute requests for you. It will handle converting requests into JSON, 
 setting up and executing http requests and parsing API responses for you. All that remains is to fill out the request 
@@ -187,12 +191,20 @@ If the exception occurs, this is how you can present detailed error message to t
 <div class="alert alert-danger" role="alert">
     <b>An error occurred!</b> Reason:
     <?php
+    $errorMessage = $apiCallException->getMessage();
     $errorResponse = json_decode($apiCallException->getMessage());
-    $errorReason = $errorResponse->requestError->serviceException->text;
+    if (json_last_error() == JSON_ERROR_NONE) {
+        $errorReason = $errorResponse->requestError->serviceException->text;
+    } else {
+        $errorReason = $errorMessage;
+    }
     echo $errorReason;
     ?>
 </div>
 ```
+
+The code above will try to parse error response from the API and if even that fails will print whatever message the 
+`$apiCallException` contained.
 
 And that's all the code you'll need to send an sms message! You now have a full functional app for sending messages. 
 You can find the full code at [advancedSms.php](https://github.com/infobip/infobip-api-php-tutorial/blob/api-client-example/advancedSms.php).
@@ -217,9 +229,12 @@ use infobip\api\model\sms\mt\logs\GetSentSmsLogsExecuteContext;
 And again, you can instantiate a client object by passing the authentication configuration to it's constructor:
 
 ```php
-$configuration = new BasicAuthConfiguration($_POST['username'], $_POST['password']);
+$configuration = new BasicAuthConfiguration($_POST['username'], $_POST['password'], 'http://api.infobip.com/');
 $client = new GetSentSmsLogs($configuration);
 ```
+
+Once again, you can leave the last parameter of the `BasicAuthConfiguration` constructor out in your production code.
+See note in the [introduction](#infobip-api-php-tutorial) chapter.
 
 ### Building the execution context
 
@@ -278,10 +293,15 @@ Finally, you can handle the exception the same way you did it in the previous ch
 <div class="alert alert-danger" role="alert">
     <b>An error occurred!</b> Reason:
     <?php
-    $errorResponse = json_decode($apiCallException->getMessage());
-    $errorReason = $errorResponse->requestError->serviceException->text;
-    echo $errorReason;
-    ?>
+	$errorMessage = $apiCallException->getMessage();
+	$errorResponse = json_decode($apiCallException->getMessage());
+	if (json_last_error() == JSON_ERROR_NONE) {
+	    $errorReason = $errorResponse->requestError->serviceException->text;
+	} else {
+	    $errorReason = $errorMessage;
+	}
+	echo $errorReason;
+	?>
 </div>
 ```
 
