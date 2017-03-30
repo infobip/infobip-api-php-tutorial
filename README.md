@@ -39,7 +39,7 @@ With the *composer.json* file in place you can instruct [composer] to fetch list
 following command from the terminal:
 
 ```
-php composer install
+composer install
 ```
 
 Whit that there should now be a directory named *vendor* next to the *composer.json* file. If you look inside it 

@@ -6,7 +6,7 @@
 <body>
 <div class="container">
     <div class="page-header">
-        <h1>Sent messages logs</h1>
+        <h1>Infobip API PHP Tutorial</h1>
     </div>
     <div>
         <ul class="nav nav-pills nav-stacked">
