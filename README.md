@@ -346,16 +346,19 @@ if ($responseBody) {
 ```
 
 The code above shows that `file_get_contents('php://input')` method is used for getting a raw POST data as a string. 
-This raw POST data is the delivery report coming from Infobip and is saved locally into a dlr.txt file with 
+This raw POST data is the delivery report coming from Infobip and is saved locally into a *dlr.txt* file with 
 `file_put_contents("dlr.txt", $responseBody)`. The else block uses the request body saved in the file and shows you how 
 to inspect whether the data is parsed as XML or JSON, and how to extract pushed delivery reports. For XML we inspect if 
-response body string starts with `<reportResponse>`, and if not, try to decode it without errors - *isJson()* function. 
-If all conditions are `FALSE`, *$result* variable stays unset which means we should say to user that no delivery report 
+response body string starts with `<reportResponse>`, and if not, try to decode it without errors - `isJson()` function. 
+If all conditions are `FALSE`, `$result` variable stays unset which means we should say to user that no delivery report 
 was pushed to callback server.
-Please note that data handling via files is used so this demo can showcase sending and receiving messages at the same 
-time, reusing the same page. Saving in file occurs when the delivery report arrives, while reading occurs when you
-refresh the delivery reports page after that. It is not something we would recommend using in your implementation of 
-handling delivery reports.
+
+Please note that data handling via a file is used so this demo can showcase sending and receiving messages at the same 
+time, reusing the same page. Saving to file occurs when the delivery report arrives, while reading occurs when the 
+page is requested by the browser's GET request. Each new delivery report will override the previous one so only the 
+latest report can ever be viewed. Also, the report is shown to anyone visiting the page regardless of the user that 
+sent the original message. In production grade application you'd want to save each report without rewriting previous 
+ones and would only show reports to users authorised to see them.
 
 ### Parsing the result
 
