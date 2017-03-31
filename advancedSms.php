@@ -127,8 +127,8 @@
 
         // Message has text and the sender of the sms along with other metadata useful for tracking delivery
         $message = new Message();
-        // One message can be sent to multiple destinations, that is why it takes and array of Destination object
-	    // In this example we send sms to only a single phone number so an array with only one destination is set
+        // One message can be sent to multiple destinations, that is why it takes an array of Destination objects
+        // In this example we send sms only to a single phone number so an array with only one destination is set
         $message->setDestinations([$destination]);
         $message->setFrom($_POST['fromInput']);
         $message->setText($_POST['textInput']);
@@ -145,46 +145,46 @@
             // Executing request
             $apiResponse = $client->execute($requestBody);
             ?>
-	        <h4>Response</h4><br>
+            <h4>Response</h4><br>
             <div>
-	            <table id="logs_table" class="table table-condensed">
-		            <thead>
-			            <tr>
-				            <th>Message ID</th>
-				            <th>To</th>
-				            <th>Status Group ID</th>
-				            <th>Status Group Name</th>
-				            <th>Status ID</th>
-				            <th>Status Name</th>
-				            <th>Status Description</th>
-				            <th>SMS Count</th>
-			            </tr>
-		            </thead>
-		            <tbody>
-                        <?php
-                        $messages = $apiResponse->getMessages();
-                        foreach ($messages as $message) {
-                            echo "<tr>";
-                            echo "<td>" . $message->getMessageId() . "</td>";
-                            echo "<td>" . $message->getTo() . "</td>";
-                            echo "<td>" . $message->getStatus()->getGroupId() . "</td>";
-                            echo "<td>" . $message->getStatus()->getGroupName() . "</td>";
-                            echo "<td>" . $message->getStatus()->getId() . "</td>";
-                            echo "<td>" . $message->getStatus()->getName() . "</td>";
-                            echo "<td>" . $message->getStatus()->getDescription() . "</td>";
-                            echo "<td>" . $message->getSmsCount() . "</td>";
-                            echo "</tr>";
-                        }
-                        ?>
-		            </tbody>
-	            </table>
+                <table id="logs_table" class="table table-condensed">
+                    <thead>
+                    <tr>
+                        <th>Message ID</th>
+                        <th>To</th>
+                        <th>Status Group ID</th>
+                        <th>Status Group Name</th>
+                        <th>Status ID</th>
+                        <th>Status Name</th>
+                        <th>Status Description</th>
+                        <th>SMS Count</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <?php
+                    $messages = $apiResponse->getMessages();
+                    foreach ($messages as $message) {
+                        echo "<tr>";
+                        echo "<td>" . $message->getMessageId() . "</td>";
+                        echo "<td>" . $message->getTo() . "</td>";
+                        echo "<td>" . $message->getStatus()->getGroupId() . "</td>";
+                        echo "<td>" . $message->getStatus()->getGroupName() . "</td>";
+                        echo "<td>" . $message->getStatus()->getId() . "</td>";
+                        echo "<td>" . $message->getStatus()->getName() . "</td>";
+                        echo "<td>" . $message->getStatus()->getDescription() . "</td>";
+                        echo "<td>" . $message->getSmsCount() . "</td>";
+                        echo "</tr>";
+                    }
+                    ?>
+                    </tbody>
+                </table>
             </div>
             <?php
         } catch (Exception $apiCallException) {
             // Handling errors in request execution
             ?>
             <div class="alert alert-danger" role="alert">
-	            <b>An error occurred!</b> Reason:
+                <b>An error occurred!</b> Reason:
                 <?php
                 $errorMessage = $apiCallException->getMessage();
                 $errorResponse = json_decode($apiCallException->getMessage());
