@@ -9,28 +9,34 @@ their status:
   - [Sent messages logs](#sent-messages-logs)
   - [Delivery reports on Notify URL](#delivery-reports-on-notify-url)
 
-We will [start](https://github.com/infobip/infobip-api-php-tutorial/blob/api-client-example/index.php) with examples and presentations so you can choose which action you want to perform.
+We will [start](https://github.com/infobip/infobip-api-php-tutorial/blob/api-client-example/index.php) with examples 
+and presentations so you can choose which action you want to perform.
 
-To be able to follow this tutorial, to write and test on your own, you need to set the environment (and we don’t mean to set lights and make some coffee). In order to send messages, get logs, and receive your delivery reports, you have to enable [cURL] php extension in your web server.
+To be able to follow this tutorial, to write and test on your own, you need to set the environment (and we don’t mean 
+to set lights and make some coffee). In order to send messages, get logs, and receive your delivery reports, you have 
+to enable [cURL] php extension in your web server.
 
-For the purpose of this tutorial, you can use some solution from [AMP] solution stack (wamp, xampp, ...). Those are software stacks for the various OSes consisting of Apache web server, MySQL database and PHP programming language support. You should enable **phpcurl** extension for the one you choose.
+For the purpose of this tutorial, you can use some solution from [AMP] solution stack (wamp, xampp, ...). Those are 
+software stacks for the various OSes consisting of Apache web server, MySQL database and PHP programming language 
+support. You should enable **phpcurl** extension for the one you choose.
 
 Additionally, you should have [composer] installed. It is a tool for resolving dependencies in PHP projects and will 
-simplify the download and usage of Infobip API client that our project will use. You can find detailed instruction 
+simplify the download and usage of [Infobip API client] that our project will use. You can find detailed instruction 
 on how to install the [composer] on their website and this tutorial will cover the instruction for actually using it.
 
-> **Note:** In order to have a secure sending of SMS messages, these examples should be hosted on HTTPS (using TLS) when going live. Just for sake of simplicity in this tutorial, we have used plain HTTP.
+> **Note:** In order to have a secure sending of SMS messages, these examples should be hosted on HTTPS (using TLS) 
+when going live. Just for sake of simplicity in this tutorial, we have used plain HTTP.
 
 ## Infobip API client
 
-In order to use Infobip API client library you will first need to download it into your project. To ease this process
-it is recommended you use [composer]. Whit it all you have to do is define a version of the client you wish to use. 
-You do that in a special file named [composer.json](https://github.com/infobip/infobip-api-php-tutorial/blob/api-client-example/composer.json):
+In order to use [Infobip API client] library you will first need to download it into your project. To ease this process
+it is recommended you use [composer]. With it all you have to do is define a version of the client you wish to use. 
+You do that in a special file named [composer.json]:
  
 ```json
 {
   "require": {
-    "infobip/infobip-api-php-client": "2.0.0"
+    "infobip/infobip-api-php-client": "2.0.1"
   }
 }
 ```
@@ -42,15 +48,15 @@ following command from the terminal:
 composer install
 ```
 
-Whit that there should now be a directory named *vendor* next to the *composer.json* file. If you look inside it 
+With that there should now be a directory named *vendor* next to the *composer.json* file. If you look inside it 
 there is a file named *autoload.php* that will come in handy later. Additionally, *vendor* directory has separate 
 subdirectories for infobip api client library code and it's dependencies.
 
 ## A fully featured textual message
 
-The fully featured textual message page ([advancedSms.php](https://github.com/infobip/infobip-api-php-tutorial/blob/api-client-example/advancedSms.php))
-contains the form for [sending an sms message][fftm]. Submit button will send the request to a page specified in 
-`action` attribute of the form. In this example it will post it to itself.
+The fully featured textual message page ([advancedSms.php]) contains the form for [sending an sms message][fftm].
+Submit button will send the request to a page specified in `action` attribute of the form. In this example it will 
+post it to itself.
 
 
 ```php
@@ -64,7 +70,7 @@ time keep in mind that none of these fields will be present.
 
 ### Using Infobip API client
 
-We will be using the Infobip API client to make http requests. That will shorten the code considerably, but first 
+We will be using the [Infobip API client] to make http requests. That will shorten the code considerably, but first 
 you need to tell php where to find necessary classes. You do that by *require-ing* the before mentioned *autoload.php* 
 file from *vendors* directory and then specifying parts of client library to use:
  
@@ -89,7 +95,8 @@ $client = new SendMultipleTextualSmsAdvanced($configuration);
 
 Note the last parameter in the `BasicAuthConfiguration` constructor ant its use of http protocol. This is 
 done for simplicity only. In your production implementation you should leave that parameter out entirely. In that 
-case configuration object will default to using https. See note in the [introduction](#infobip-api-php-tutorial) chapter.
+case configuration object will default to using https. See the note in the [introduction](#infobip-api-php-tutorial) 
+chapter.
 
 Now you have a `$client` that you can ask to execute requests for you. It will handle converting requests into JSON, 
 setting up and executing http requests and parsing API responses for you. All that remains is to fill out the request 
@@ -128,8 +135,8 @@ $message->setCallbackData($_POST['callbackDataInput']);
 Properties `from` and `text` define part of the sms message visible to the message's recipient. Specifically, `from` 
 will be displayed as a sender of the message and `text` will, naturally, be the sent text. On the other hand, 
 `notifyUrl`, `notifyContentType` and `callbackData` are meta properties that are used to generate the delivery report
-and send it back to you. You'll find out more about delivery reports in the [Delivery reports on Notify URL](#delivery-reports-on-notify-url)
-chapter.
+and send it back to you. You'll find out more about delivery reports in the 
+[Delivery reports on Notify URL](#delivery-reports-on-notify-url) chapter.
 
 Finally, you wrap the message in a request model:
 
@@ -160,7 +167,7 @@ try {
 }
  ```
 
-To display results iterate through the array of sent message responses with a foreach loop and write a single row for 
+To display results, iterate through the array of sent message responses with a foreach loop and write a single row for 
 each of sent messages. In our example we chose to present: `messageId`, `to`, `smsCount`, `status`, but you can choose 
 which ever you want. Code should look like this:
  ```php
@@ -206,12 +213,13 @@ If the exception occurs, this is how you can present detailed error message to t
 The code above will try to parse error response from the API and if even that fails will print whatever message the 
 `$apiCallException` contained.
 
-And that's all the code you'll need to send an sms message! You now have a full functional app for sending messages. 
-You can find the full code at [advancedSms.php](https://github.com/infobip/infobip-api-php-tutorial/blob/api-client-example/advancedSms.php).
+And that's all the code you'll need to send an sms message! You now have a fully functional app for sending messages. 
+You can find the full code at [advancedSms.php].
 
 ## Sent messages logs
 
-When you choose this option it opens [logs.php](https://github.com/infobip/infobip-api-php-tutorial/blob/api-client-example/logs.php) page with input form for [getting sent messages logs][sentlogs]. Submit button will **POST** those fields to itself.
+When you choose this option it opens [logs.php] page with input form for [getting sent messages logs][sentlogs]. Submit 
+button will **POST** those fields to itself.
 
 ### Using Infobip API client
 
@@ -234,7 +242,7 @@ $client = new GetSentSmsLogs($configuration);
 ```
 
 Once again, you can leave the last parameter of the `BasicAuthConfiguration` constructor out in your production code.
-See note in the [introduction](#infobip-api-php-tutorial) chapter.
+See the note in the [introduction](#infobip-api-php-tutorial) chapter.
 
 ### Building the execution context
 
@@ -257,10 +265,10 @@ the *try-catch block* to wrap the call to `$client->execute` and handle the pote
 
  ```php
 try {
-	$apiResponse = $client->execute($context);
-	// display results
+    $apiResponse = $client->execute($context);
+    // display results
 } catch (Exception $apiCallException) {
-	// display the error message
+    // display the error message
 }
  ```
 
@@ -293,50 +301,68 @@ Finally, you can handle the exception the same way you did it in the previous ch
 <div class="alert alert-danger" role="alert">
     <b>An error occurred!</b> Reason:
     <?php
-	$errorMessage = $apiCallException->getMessage();
-	$errorResponse = json_decode($apiCallException->getMessage());
-	if (json_last_error() == JSON_ERROR_NONE) {
-	    $errorReason = $errorResponse->requestError->serviceException->text;
-	} else {
-	    $errorReason = $errorMessage;
-	}
-	echo $errorReason;
-	?>
+    $errorMessage = $apiCallException->getMessage();
+    $errorResponse = json_decode($apiCallException->getMessage());
+    if (json_last_error() == JSON_ERROR_NONE) {
+        $errorReason = $errorResponse->requestError->serviceException->text;
+    } else {
+        $errorReason = $errorMessage;
+    }
+    echo $errorReason;
+    ?>
 </div>
 ```
 
-Again, the full code for this page can be found at [logs.php](https://github.com/infobip/infobip-api-php-tutorial/blob/api-client-example/logs.php).
+Again, the full code for this page can be found at [logs.php].
 
 ## Delivery reports on Notify URL
 
-This feature is slightly different from the previous two - the page [dlrPush.php](https://github.com/infobip/infobip-api-php-tutorial/blob/api-client-example/dlrPush.php)
-is not used for requesting some data, [it is waiting for it][dlrnotify]. When the data is pushed to this page, it can be parsed 
-and showed to the user in appropriate way.
+This feature is slightly different from the previous two - the page [dlrPush.php] is not used for requesting some data, 
+[it is waiting for it][dlrnotify]. When the data is pushed to this page, it can be parsed and showed to the user in 
+appropriate way.
 
->**Note:** The delivery reports are pushed from the fully featured textual message page by entering *this page URL* in *Notify URL* field. Also, *Notify ContentType* field in that page defines which type of body is about to arrive.
+>**Note:** In order to see the the delivery reports inside the demo, they should be pushed from the fully featured 
+textual message page by entering *the dlrPush.php page URL* in the *Notify URL* field. Also, *Notify ContentType* field 
+in that page defines which type of body is about to arrive.
 
 ### Receiving pushed delivery report
 
 ```php
 $responseBody = file_get_contents('php://input');
-if ($responseBody <> "") {
-	if (isJson($responseBody)) {
-	    $responseJson = json_decode($responseBody);
-        $results = $responseJson->results;
-    } else if (strpos(trim($responseBody), '<reportResponse>') == 0) {
-        $responseXml = simplexml_load_string($responseBody);
-        $results = $responseBody->results->result;
+if ($responseBody) {
+    file_put_contents("dlr.txt", $responseBody);
+} else {
+    $fileBody = file_get_contents("dlr.txt");
+    if ($fileBody <> "") {
+        if (isJson($fileBody)) {
+            $responseJson = json_decode($fileBody);
+            $results = $responseJson->results;
+        } else if (strpos(trim($fileBody), '<reportResponse>') === 0) {
+            $responseXml = simplexml_load_string($fileBody);
+            $results = $fileBody->results->result;
+        }
     }
 }
 ```
 
-The code above shows that `file_get_contents('php://input')` method is used for getting a raw POST data as a string. Later lines show you how to inspect whether the data is parsed as XML or JSON, and how to extract pushed delivery reports.
-
-For XML we inspect if response body string starts with `<reportResponse>`, and if not, try to decode it without errors - *isJson()* function. If all conditions are `FALSE`, *$result* variable stays unset which means we should say to user that no delivery report was pushed to callback server.
+The code above shows that `file_get_contents('php://input')` method is used for getting a raw POST data as a string. 
+This raw POST data is the delivery report coming from Infobip and is saved locally into a dlr.txt file with 
+`file_put_contents("dlr.txt", $responseBody)`. The else block uses the request body saved in the file and shows you how 
+to inspect whether the data is parsed as XML or JSON, and how to extract pushed delivery reports. For XML we inspect if 
+response body string starts with `<reportResponse>`, and if not, try to decode it without errors - *isJson()* function. 
+If all conditions are `FALSE`, *$result* variable stays unset which means we should say to user that no delivery report 
+was pushed to callback server.
+Please note that data handling via files is used so this demo can showcase sending and receiving messages at the same 
+time, reusing the same page. Saving in file occurs when the delivery report arrives, while reading occurs when you
+refresh the delivery reports page after that. It is not something we would recommend using in your implementation of 
+handling delivery reports.
 
 ### Parsing the result
 
-Parsing of pushed delivery reports is similar to parsing the response of [fully featured textual message](#fully-featured-textual-message) and [sent message logs](#sentlogs) methods, except we do not check the HTTP response code (because there is no response at all). All we have to do is to choose which information from pushed delivery reports we want to show, and write it to the page.
+Parsing of pushed delivery reports is similar to parsing the response of 
+[fully featured textual message](#fully-featured-textual-message) and [sent message logs](#sentlogs) methods, except 
+we do not check the HTTP response code (because there is no response at all). All we have to do is to choose which 
+information from pushed delivery reports we want to show, and write it to the page.
 
 [//]: #
 
@@ -346,3 +372,8 @@ Parsing of pushed delivery reports is similar to parsing the response of [fully 
    [cURL]: <http://php.net/manual/en/function.curl-setopt.php>
    [AMP]: <https://en.wikipedia.org/wiki/List_of_Apache%E2%80%93MySQL%E2%80%93PHP_packages>
    [composer]: <https://getcomposer.org/doc/00-intro.md>
+   [composer.json]: <https://github.com/infobip/infobip-api-php-tutorial/blob/api-client-example/composer.json>
+   [Infobip API client]: <https://github.com/infobip/infobip-api-php-client>
+   [advancedSms.php]: <https://github.com/infobip/infobip-api-php-tutorial/blob/api-client-example/advancedSms.php>
+   [logs.php]: <https://github.com/infobip/infobip-api-php-tutorial/blob/api-client-example/logs.php>
+   [dlrPush.php]: <https://github.com/infobip/infobip-api-php-tutorial/blob/api-client-example/dlrPush.php>

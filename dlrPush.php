@@ -20,18 +20,22 @@
     }
 
     $responseBody = file_get_contents('php://input');
-
-    if ($responseBody <> "") {
-        if (isJson($responseBody)) {
-            $responseJson = json_decode($responseBody);
-            $results = $responseJson->results;
-        } else if (strpos(trim($responseBody), '<reportResponse>') === 0) {
-            $responseXml = simplexml_load_string($responseBody);
-            $results = $responseBody->results->result;
+    if ($responseBody) {
+        file_put_contents("dlr.txt", $responseBody);
+    } else {
+        $fileBody = file_get_contents("dlr.txt");
+        if ($fileBody <> "") {
+            if (isJson($fileBody)) {
+                $responseJson = json_decode($fileBody);
+                $results = $responseJson->results;
+            } else if (strpos(trim($fileBody), '<reportResponse>') === 0) {
+                $responseXml = simplexml_load_string($fileBody);
+                $results = $fileBody->results->result;
+            }
         }
     }
 
-    if (isset($result)) {
+    if (isset($results)) {
         // Using GMT timezone when not specified
         date_default_timezone_set('Europe/London');
         ?>
@@ -50,7 +54,7 @@
             </thead>
             <tbody>
             <?php
-            foreach ($result as $message) {
+            foreach ($results as $message) {
                 echo "<tr>";
                 echo "<td>" . $message->messageId . "</td>";
                 echo "<td>" . $message->to . "</td>";
