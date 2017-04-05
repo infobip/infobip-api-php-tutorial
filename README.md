@@ -1,23 +1,23 @@
-# Infobip API PHP tutorial
+# Infobip PHP Client library tutorial
 
-Welcome to Infobip beginners’ tutorial for creating your own SMS web app. We will guide you one step at a time 
-through usage of Infobip API client. Tutorial includes three examples for some of the main features for sending SMS 
-messages and checking 
-their status:
+If you are looking to integrate with Infobip platform while coding in PHP you are at the right place. In this tutorial 
+we will go through all the steps of setting up a fully functional PHP web app and using [Infobip API client] library.
+By using the client library we will greatly simplify our code as all the http API calls and model serialization is 
+handled by the library. 
 
-  - [Fully featured textual message](#a-fully-featured-textual-message)
-  - [Sent messages logs](#sent-messages-logs)
-  - [Delivery reports on Notify URL](#delivery-reports-on-notify-url)
+The tutorial itself is separated into 3 feature based chapters, each describing one page of our web application:
+  - [Send sms message](#send-sms-message)
+  - [Retrieve message logs](#retrieve-message-logs)
+  - [Receive delivery report](#receive-delivery-report)
 
-We will [start](https://github.com/infobip/infobip-api-php-tutorial/blob/api-client-example/index.php) with examples 
-and presentations so you can choose which action you want to perform.
+The [index](https://github.com/infobip/infobip-api-php-tutorial/blob/api-client-example/index.php) page links to those 
+three feature pages so you can easily navigate between them. 
 
-To be able to follow this tutorial, to write and test on your own, you need to set the environment (and we don’t mean 
-to set lights and make some coffee). In order to send messages, get logs, and receive your delivery reports, you have 
-to enable [cURL] php extension in your web server.
+For this application to work properly you need to configure your PHP server. Since client library makes http requests
+to Infobip API you will need to enable [cURL] PHP extension in your web server.
 
-For the purpose of this tutorial, you can use some solution from [AMP] solution stack (wamp, xampp, ...). Those are 
-software stacks for the various OSes consisting of Apache web server, MySQL database and PHP programming language 
+In order to run the application you can use some solution from [AMP] solution stack (wamp, xampp, ...). Those are 
+software stacks for various OSes consisting of Apache web server, MySQL database and PHP programming language 
 support. You should enable **phpcurl** extension for the one you choose.
 
 Additionally, you should have [composer] installed. It is a tool for resolving dependencies in PHP projects and will 
@@ -52,11 +52,13 @@ With that there should now be a directory named *vendor* next to the *composer.j
 there is a file named *autoload.php* that will come in handy later. Additionally, *vendor* directory has separate 
 subdirectories for infobip api client library code and it's dependencies.
 
-## A fully featured textual message
+## Send sms message
 
-The fully featured textual message page ([advancedSms.php]) contains the form for [sending an sms message][fftm].
-Submit button will send the request to a page specified in `action` attribute of the form. In this example it will 
-post it to itself.
+The fully featured textual message page ([advancedSms.php]) contains the input form for [sending an sms 
+message][fftm]. Required fields are username, password and destination phone number, all other values are optional. 
+For additional explanation of notify URL content type and callback data see the [Receive delivery report](#receive-delivery-report)
+chapter. Submit button will send the request to a page specified in `action` attribute of the form. In this example 
+it will post it to itself.
 
 
 ```php
@@ -116,7 +118,7 @@ $destination->setMessageId($_POST['messageIdInput']);
 
 `to` property is the phone number that the sms will be sent to while `messageId` is a bit more interesting. That 
 property is used later on to uniquely identify the sms message when, for example, fetching the logs for it. We will 
-see this used in the [Sent messages logs](#sent-messages-logs) chapter of this tutorial. Note that, while `to` 
+see this used in the [Retrieve message logs](#retrieve-message-logs) chapter of this tutorial. Note that, while `to` 
 property is required, `messageId` is not and the sms will be successfully sent event if it is not set. In that case 
 the API will generate a random message id which you will receive in the response to this request. 
 
@@ -136,7 +138,7 @@ Properties `from` and `text` define part of the sms message visible to the messa
 will be displayed as a sender of the message and `text` will, naturally, be the sent text. On the other hand, 
 `notifyUrl`, `notifyContentType` and `callbackData` are meta properties that are used to generate the delivery report
 and send it back to you. You'll find out more about delivery reports in the 
-[Delivery reports on Notify URL](#delivery-reports-on-notify-url) chapter.
+[Receive delivery report](#receive-delivery-report) chapter.
 
 Finally, you wrap the message in a request model:
 
@@ -216,14 +218,16 @@ The code above will try to parse error response from the API and if even that fa
 And that's all the code you'll need to send an sms message! You now have a fully functional app for sending messages. 
 You can find the full code at [advancedSms.php].
 
-## Sent messages logs
+## Retrieve message logs
 
-When you choose this option it opens [logs.php] page with input form for [getting sent messages logs][sentlogs]. Submit 
-button will **POST** those fields to itself.
+Sent messages logs page ([logs.php]) is used to retrieve the logs of sent messages and display then to your 
+users. It contains input form for credentials that are needed to [retrieve the logs][sentlogs] from Infobip API. 
+Additionally ia allows the user to filter all of the available logs by either destination phone number or exact 
+message id. With submit button the page will **POST** those fields to itself.
 
 ### Using Infobip API client
 
-Same as we did in the [fully featured textual message](#fully-featured-textual-message) chapter we'll need to use a 
+Same as we did in the [Send sms message](#send-sms-message) chapter we'll need to use a 
 couple of classes from the API client library. This time `use` statements will look like this:
  
  ```php
@@ -315,11 +319,11 @@ Finally, you can handle the exception the same way you did it in the previous ch
 
 Again, the full code for this page can be found at [logs.php].
 
-## Delivery reports on Notify URL
+## Receive delivery report
 
 This feature is slightly different from the previous two - the page [dlrPush.php] is not used for requesting some data, 
-[it is waiting for it][dlrnotify]. When the data is pushed to this page, it can be parsed and showed to the user in 
-appropriate way.
+but is in fact [waiting for it][dlrnotify]. When the data is pushed to this page, it can be parsed and shown to the 
+user in appropriate way.
 
 >**Note:** In order to see the the delivery reports inside the demo, they should be pushed from the fully featured 
 textual message page by entering *the dlrPush.php page URL* in the *Notify URL* field. Also, *Notify ContentType* field 
@@ -363,7 +367,7 @@ ones and would only show reports to users authorised to see them.
 ### Parsing the result
 
 Parsing of pushed delivery reports is similar to parsing the response of 
-[fully featured textual message](#fully-featured-textual-message) and [sent message logs](#sentlogs) methods, except 
+[Send sms message](#send-sms-message) and [sent message logs](#sentlogs) methods, except 
 we do not check the HTTP response code (because there is no response at all). All we have to do is to choose which 
 information from pushed delivery reports we want to show, and write it to the page.
 
