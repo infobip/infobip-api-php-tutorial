@@ -1,0 +1,5 @@
+{
+  "require": {
+    "infobip/infobip-api-php-client": "2.0.1"
+  }
+}
